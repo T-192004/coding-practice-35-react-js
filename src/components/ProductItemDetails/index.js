@@ -20,6 +20,7 @@ class ProductItemDetails extends Component {
     errorMsg: '',
     similarProducts: [],
     apiStatus: apiStatusConstants.initial,
+    itemsInCart: 1,
   }
 
   getProductData = async () => {
@@ -38,7 +39,7 @@ class ProductItemDetails extends Component {
     const fetchedData = await response.json()
     console.log(response.status)
     console.log(fetchedData)
-    if (response.status === 200) {
+    if (response.ok) {
       const updatedFetchedData = this.getFormattedData(fetchedData)
       const updatedSimilarProductsData = fetchedData.similar_products.map(
         item => this.getFormattedData(item),
@@ -61,8 +62,21 @@ class ProductItemDetails extends Component {
     this.getProductData()
   }
 
+  onClickPlusButton = () => {
+    this.setState(prev => ({itemsInCart: prev.itemsInCart + 1}))
+  }
+
+  onClickMinusButton = () => {
+    const {itemsInCart} = this.state
+    if (itemsInCart === 1) {
+      this.setState({itemsInCart: 1})
+    } else {
+      this.setState(prev => ({itemsInCart: prev.itemsInCart - 1}))
+    }
+  }
+
   renderProductDetailsView = () => {
-    const {productDetails, similarProducts} = this.state
+    const {productDetails, similarProducts, itemsInCart} = this.state
     const {
       imageUrl,
       title,
@@ -93,25 +107,25 @@ class ProductItemDetails extends Component {
               <p className="main-product-reviews">{totalReviews} Reviews</p>
             </div>
             <p className="main-product-descripiton">{description}</p>
-            <p className="main-product-other-details">
-              Availability:
-              <span className="main-product-other-values"> {availability}</span>
+            <p className="main-product-other-values">
+              <span className="main-product-other-details">Availability: </span>
+              {availability}
             </p>
-            <p className="main-product-other-details">
-              Brand:
-              <span className="main-product-other-values"> {brand}</span>
+            <p className="main-product-other-values">
+              <span className="main-product-other-details">Brand: </span>
+              {brand}
             </p>
             <hr className="line" />
             <div className="product-add-container">
-              <button className="product-add-symbol" data-testid="minus">
+              <button className="product-add-symbol" data-testid="minus"  onClick={this.onClickMinusButton}>
                 <BsDashSquare />
               </button>
-              <p className="product-quantity">1</p>
-              <button className="product-add-symbol" data-testid="plus">
+              <p className="product-quantity">{itemsInCart}</p>
+              <button className="product-add-symbol" data-testid="plus" onClick={this.onClickPlusButton}>
                 <BsPlusSquare />
               </button>
             </div>
-            <button className="add-card-btn">Add Cart</button>
+            <button className="add-card-btn">ADD TO CART</button>
           </div>
         </div>
         <div className="similar-products-container">
